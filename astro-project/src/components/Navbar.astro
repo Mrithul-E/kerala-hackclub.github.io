@@ -7,14 +7,14 @@ const navLinks = [
 ];
 ---
 
-<nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-100">
+<nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-100" role="navigation" aria-label="Primary navigation">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="flex justify-between items-center h-16">
       <div class="flex-shrink-0 flex items-center gap-2">
         <a href="/" class="flex items-center gap-2">
-          <img 
-            src="https://assets.hackclub.com/flag-orpheus-left.svg" 
-            alt="Hack Club Logo" 
+          <img
+            src="https://assets.hackclub.com/flag-orpheus-left.svg"
+            alt="Hack Club Logo"
             class="h-10 w-auto hover:rotate-12 transition-transform cursor-pointer"
           />
           <span class="font-bold text-xl tracking-tight text-slate-900">
@@ -22,6 +22,7 @@ const navLinks = [
           </span>
         </a>
       </div>
+
       <div class="hidden sm:flex sm:space-x-8">
         {navLinks.map(link => (
           <a
@@ -31,22 +32,90 @@ const navLinks = [
             {link.name}
           </a>
         ))}
-        <a 
-          href="https://hackclub.com/slack/" 
-          target="_blank" 
+        <a
+          href="https://hackclub.com/slack/"
+          target="_blank"
           class="bg-[#ec3750] text-white px-4 py-2 rounded-full text-sm font-bold hover:bg-[#d63148] transition-all hover:shadow-md active:scale-95"
         >
           Join Slack
         </a>
       </div>
+
       <div class="sm:hidden flex items-center">
-        <!-- Mobile menu button could go here -->
-         <button class="text-slate-600">
-            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-         </button>
+        <button
+          id="mobile-menu-button"
+          aria-controls="mobile-menu"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+          class="p-2 rounded-md inline-flex items-center text-slate-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#ec3750]"
+        >
+          <!-- hamburger (visible by default) -->
+          <svg data-icon="open" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+          <!-- close (hidden by default) -->
+          <svg data-icon="close" class="h-6 w-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
       </div>
+    </div>
+
+    <!-- Mobile menu: hidden by default, toggled by JS -->
+    <div id="mobile-menu" class="hidden sm:hidden mt-2 space-y-1 px-2 pb-4" role="menu" aria-label="Mobile navigation">
+      {navLinks.map(link => (
+        <a
+          role="menuitem"
+          href={link.href}
+          class="block px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:bg-slate-100 hover:text-[#ec3750]"
+        >
+          {link.name}
+        </a>
+      ))}
+      <a
+        role="menuitem"
+        href="https://hackclub.com/slack/"
+        target="_blank"
+        class="block bg-[#ec3750] text-white px-4 py-2 rounded-full text-sm font-bold hover:bg-[#d63148]"
+      >
+        Join Slack
+      </a>
     </div>
   </div>
 </nav>
+
+<script type="module" client:load>
+  const btn = document.getElementById('mobile-menu-button');
+  const menu = document.getElementById('mobile-menu');
+
+  if (btn && menu) {
+    const openIcon = btn.querySelector('[data-icon="open"]');
+    const closeIcon = btn.querySelector('[data-icon="close"]');
+
+    const setOpen = (open) => {
+      btn.setAttribute('aria-expanded', String(open));
+      menu.classList.toggle('hidden', !open);
+
+      if (openIcon) openIcon.classList.toggle('hidden', open);
+      if (closeIcon) closeIcon.classList.toggle('hidden', !open);
+    };
+
+    // initialize closed
+    setOpen(false);
+
+    btn.addEventListener('click', () => {
+      const currentlyOpen = btn.getAttribute('aria-expanded') === 'true';
+      setOpen(!currentlyOpen);
+    });
+
+    // close when a menu link is clicked (nice UX for single-page behavior)
+    menu.querySelectorAll('a[href]').forEach((a) => {
+      a.addEventListener('click', () => setOpen(false));
+    });
+
+    // close on Escape
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') setOpen(false);
+    });
+  }
+</script>
