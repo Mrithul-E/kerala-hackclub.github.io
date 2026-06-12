@@ -61,25 +61,33 @@ const navLinks = [
       </div>
     </div>
 
-    <!-- Mobile menu: hidden by default, toggled by JS -->
-    <div id="mobile-menu" class="hidden sm:hidden mt-2 space-y-1 px-2 pb-4" role="menu" aria-label="Mobile navigation">
-      {navLinks.map(link => (
+    <!-- Mobile menu -->
+    <div
+      id="mobile-menu"
+      class="sm:hidden overflow-hidden"
+      style="max-height: 0; transition: max-height 0.3s ease;"
+      role="menu"
+      aria-label="Mobile navigation"
+    >
+      <div class="mt-2 space-y-1 px-2 pb-4">
+        {navLinks.map(link => (
+          <a
+            role="menuitem"
+            href={link.href}
+            class="block px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:bg-slate-100 hover:text-[#ec3750]"
+          >
+            {link.name}
+          </a>
+        ))}
         <a
           role="menuitem"
-          href={link.href}
-          class="block px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:bg-slate-100 hover:text-[#ec3750]"
+          href="https://hackclub.com/slack/"
+          target="_blank"
+          class="block bg-[#ec3750] text-white px-4 py-2 rounded-full text-sm font-bold hover:bg-[#d63148]"
         >
-          {link.name}
+          Join Slack
         </a>
-      ))}
-      <a
-        role="menuitem"
-        href="https://hackclub.com/slack/"
-        target="_blank"
-        class="block bg-[#ec3750] text-white px-4 py-2 rounded-full text-sm font-bold hover:bg-[#d63148]"
-      >
-        Join Slack
-      </a>
+      </div>
     </div>
   </div>
 </nav>
@@ -91,16 +99,21 @@ const navLinks = [
   if (btn && menu) {
     const openIcon = btn.querySelector('[data-icon="open"]');
     const closeIcon = btn.querySelector('[data-icon="close"]');
+    const inner = menu.firstElementChild;
 
     const setOpen = (open) => {
       btn.setAttribute('aria-expanded', String(open));
-      menu.classList.toggle('hidden', !open);
+
+      if (open) {
+        menu.style.maxHeight = inner.scrollHeight + 'px';
+      } else {
+        menu.style.maxHeight = '0';
+      }
 
       if (openIcon) openIcon.classList.toggle('hidden', open);
       if (closeIcon) closeIcon.classList.toggle('hidden', !open);
     };
 
-    // initialize closed
     setOpen(false);
 
     btn.addEventListener('click', () => {
@@ -108,12 +121,10 @@ const navLinks = [
       setOpen(!currentlyOpen);
     });
 
-    // close when a menu link is clicked (nice UX for single-page behavior)
     menu.querySelectorAll('a[href]').forEach((a) => {
       a.addEventListener('click', () => setOpen(false));
     });
 
-    // close on Escape
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') setOpen(false);
     });
